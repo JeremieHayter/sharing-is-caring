@@ -1,6 +1,9 @@
 <#
 Stricktly dirty automation that compares existing AdobeReader package version with Version on Adobe's website.
 If web version is greater then MECM version, Download it.
+
+For additions coolness, make sure to download the BurntToast Module
+Install-Module -Name BurntToast -Repository PSGallery
 #>
 
 $CurrentWorkingDirectory = Get-Location
@@ -17,7 +20,7 @@ $URLList = $StartingContent.Links
 
 $versionlist = foreach($item in $URLList){
 
-    If ($item.innertext -like "*Planned update*$year"){
+    if ($item.innertext -like "*Planned update*$year"){
         $a = $item.innertext -replace "[^0-9.]"
         $a.substring(0,12)
     }
@@ -50,7 +53,12 @@ if($LatestAppVersion -gt $CurrentAppVersion){
     Invoke-WebRequest -Uri $downloadurl -OutFile "$PSScriptroot\Install Files\AdobeReaderDC\$MSPname"
 
     #Notify User of update
-    New-BurntToastNotification -Text "Adobe Reader Update", "A new version of Adobe Reader has been downloaded, Please create new application package" -AppLogo "$PSScriptroot\data\icons\adobe.ico" 
+    if(Get-Module -ListAvailable -Name BurntToast){
+        New-BurntToastNotification -Text "Adobe Reader Update", "A new version of Adobe Reader has been downloaded, Please create new application package" -AppLogo "$PSScriptroot\data\icons\adobe.ico" 
+    }
+    else{
+        Write-Host "A new version of Adobe Reader has been downloaded, Please create new application package" -ForegroundColor Green
+    }
 }
 
 Set-Location $CurrentWorkingDirectory
