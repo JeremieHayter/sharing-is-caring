@@ -1,10 +1,13 @@
 <#
+For additions coolness, make sure to download the BurntToast Module
+
+Install-Module -Name BurntToast -Repository PSGallery
 #>
 $CurrentWorkingDirectory = Get-Location
 
 Set-Location "$($SiteCode):"
 
-#Jank ass way of getting the latest version of java online
+#Jank way of getting the latest version of java online
 $info = Invoke-WebRequest -uri "https://www.oracle.com/java/technologies/javase/8u-relnotes.html"
 $list = $info.links.href | Where-Object {$info.links.innerText -eq "GA"}
 $cleanerList = $list | Where-Object {$_ -like "*8U*"}
@@ -15,6 +18,7 @@ $cleanestlist = ForEach($item in $cleanerList){
     $d = $c.replace("-revision-builds","")
     $d
 }
+
 $latestJava8Version = $cleanestlist[0]
 [System.Version]$AvailableVersion = "1."+$latestJava8Version.replace("u",".")
 
@@ -64,7 +68,12 @@ if($AvailableVersion -gt $CurrentAppVersion){
     }
 
     #Notify User of update
-    New-BurntToastNotification -Text "Java Update $latestJava8Version", "A new version of Java has been downloaded, Please create new application package" -AppLogo "$PSScriptroot\data\icons\Java.ico" 
+    if(Get-Module -ListAvailable -Name BurntToast){
+        New-BurntToastNotification -Text "Java Update $latestJava8Version", "A new version of Java has been downloaded, Please create new application package" -AppLogo "$PSScriptroot\data\icons\Java.ico" 
+    }
+    else{
+        Write-Host "A new version of Java has been downloaded, Please create new application package" -ForegroundColor Green
+    }
 }
 
 Set-Location $CurrentWorkingDirectory
