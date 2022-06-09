@@ -1,6 +1,9 @@
 <#
 Stricktly dirty automation that compares existing AdobeReader package version with Version on Adobe's website.
 If web version is greater then MECM version, Download it.
+
+For additions coolness, make sure to download the BurntToast Module
+Install-Module -Name BurntToast -Repository PSGallery
 #>
 
 $CurrentWorkingDirectory = Get-Location
@@ -51,7 +54,12 @@ if($LatestAppVersion -gt $CurrentAppVersion){
     Invoke-WebRequest -Uri $downloadurl -OutFile "$PSScriptroot\Install Files\AdobeAcrobat2017\$MSPname"
 
     #Notify User of update
-    New-BurntToastNotification -Text "Adobe Acrobat Update", "A new version of Adobe Acrobat has been downloaded, Please create new application package" -AppLogo "$PSScriptroot\data\icons\adobe.ico"
+    if(Get-Module -ListAvailable -Name BurntToast){
+        New-BurntToastNotification -Text "Adobe Acrobat Update", "A new version of Adobe Acrobat has been downloaded, Please create new application package" -AppLogo "$PSScriptroot\data\icons\adobe.ico"
+    }
+    else{
+        Write-Host "A new version of Adobe Acrobat has been downloaded, Please create new application package" -ForegroundColor Green
+    }
 }
 
 Set-Location $CurrentWorkingDirectory
